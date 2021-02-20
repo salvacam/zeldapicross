@@ -13,7 +13,11 @@
 #include "Keyboard.h"
 #include "Common.h"
 
+#ifdef MIYOO_MODE
+#define CONFIRM_BUTTON SDLK_LALT
+#else
 #define CONFIRM_BUTTON SDLK_LCTRL
+#endif
 
 Keyboard::Keyboard() : tmpDirUp(0), tmpDirDown(0), tmpDirLeft(0), tmpDirRight(0), 
 tmpAction(0), tmpReturn(0), tmpHypo(0), tmpMouse(0), tmpEscap(0), tmpMusic(0), 
@@ -236,49 +240,83 @@ void Keyboard::pollKeys(Uint8* keys) {
     
     
     event->ACTION = false;
+    #ifdef MIYOO_MODE
+    if ((keys[SDLK_LALT] || keys[SDLK_z]) && !event->HOLD_ACTION  
+    #else
     if ((keys[SDLK_LCTRL] || keys[SDLK_z]) && !event->HOLD_ACTION  
+    #endif
     && !event->HOLD_FLAG && !tmpAction) {
         event->HOLD_ACTION = true;
         tmpAction = 1;
     }
+
+    #ifdef MIYOO_MODE
+    if (!keys[SDLK_LALT] && !keys[SDLK_z] && event->HOLD_ACTION) {
+    #else
     if (!keys[SDLK_LCTRL] && !keys[SDLK_z] && event->HOLD_ACTION) {
+    #endif
         event->HOLD_ACTION = false;
         event->ACTION = true;
         tmpAction = 0;
     }
     
-    event->FLAG = false;
+    event->FLAG = false;    
+    #ifdef MIYOO_MODE
+    if (keys[SDLK_LCTRL] && !event->HOLD_ACTION  && !event->HOLD_FLAG 
+    && !tmpAction) {
+    #else
     if (keys[SDLK_LALT] && !event->HOLD_ACTION  && !event->HOLD_FLAG 
     && !tmpAction) {
+    #endif
         event->HOLD_FLAG = true;
         tmpAction = 1;
     }
+    #ifdef MIYOO_MODE
+    if (!keys[SDLK_LCTRL] && event->HOLD_FLAG) {
+    #else
     if (!keys[SDLK_LALT] && event->HOLD_FLAG) {
+    #endif
         event->HOLD_FLAG = false;
         event->FLAG = true;
         tmpAction = 0;
     }
     
     // cancel action
+    #ifdef MIYOO_MODE
+    if (keys[SDLK_LCTRL] && event->HOLD_ACTION  && !event->HOLD_FLAG) {
+    #else
     if (keys[SDLK_LALT] && event->HOLD_ACTION  && !event->HOLD_FLAG) {
+    #endif
         event->HOLD_ACTION = false;
         event->CANCEL_ACTION = true;
         tmpAction = 1;
     }
+    #ifdef MIYOO_MODE
+    if (!keys[SDLK_LCTRL] && !keys[SDLK_LALT] && !keys[SDLK_z] 
+    #else
     if (!keys[SDLK_LALT] && !keys[SDLK_LCTRL] && !keys[SDLK_z] 
+    #endif
     && event->CANCEL_ACTION) {
         event->CANCEL_ACTION = false;
         tmpAction = 0;
     }
     
     // cancel flag
+    #ifdef MIYOO_MODE
+    if ((keys[SDLK_LALT] || keys[SDLK_z]) && !event->HOLD_ACTION  
+    #else
     if ((keys[SDLK_LCTRL] || keys[SDLK_z]) && !event->HOLD_ACTION  
+    #endif
     && event->HOLD_FLAG) {
         event->HOLD_FLAG = false;
         event->CANCEL_FLAG = true;
         tmpAction = 1;
     }
+    #ifdef MIYOO_MODE
+    if (!keys[SDLK_LCTRL] && !keys[SDLK_LALT] && !keys[SDLK_z] && event->CANCEL_FLAG) {
+    #else
     if (!keys[SDLK_LALT] && !keys[SDLK_LCTRL] && !keys[SDLK_z] && event->CANCEL_FLAG) {
+    #endif
         event->CANCEL_FLAG = false;
         tmpAction = 0;
     }
@@ -294,20 +332,36 @@ void Keyboard::pollKeys(Uint8* keys) {
     }
     
     event->HYPOTHESE = false;
+    #ifdef MIYOO_MODE
+    if (keys[SDLK_SPACE] && !event->HYPOTHESE && !tmpHypo) {
+    #else
     if (keys[SDLK_LSHIFT] && !event->HYPOTHESE && !tmpHypo) {
+    #endif
         event->HYPOTHESE = true;
         tmpHypo = 1;
     }
+    #ifdef MIYOO_MODE
+    if (!keys[SDLK_SPACE] && tmpHypo) {
+    #else
     if (!keys[SDLK_LSHIFT] && tmpHypo) {
+    #endif
         tmpHypo = 0;
     }
     
     event->MOUSE_ON_OFF = false;
+    #ifdef MIYOO_MODE
+    if (keys[SDLK_LSHIFT] && !event->MOUSE_ON_OFF && !tmpMouse) {
+    #else
     if (keys[SDLK_SPACE] && !event->MOUSE_ON_OFF && !tmpMouse) {
+    #endif
         event->MOUSE_ON_OFF = true;
         tmpMouse = 1;
     }
+    #ifdef MIYOO_MODE
+    if (!keys[SDLK_LSHIFT] && tmpMouse) {
+    #else
     if (!keys[SDLK_SPACE] && tmpMouse) {
+    #endif
         tmpMouse = 0;
     }
     
